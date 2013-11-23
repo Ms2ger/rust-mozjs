@@ -47,6 +47,7 @@ pub mod glue;
 pub mod crust;
 pub mod jsval;
 pub mod jsfriendapi;
+pub mod rootingapi;
 
 // FIXME: Add the remaining options
 pub static JSOPTION_STRICT: uint32_t =    0b00000000000001u32;
