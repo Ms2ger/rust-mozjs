@@ -28,8 +28,8 @@ use JSCLASS_RESERVED_SLOTS_MASK;
 use JSCLASS_RESERVED_SLOTS_SHIFT;
 use JSCLASS_GLOBAL_SLOT_COUNT;
 use JS_ARGV;
-use JSVAL_VOID;
 use JS_SET_RVAL;
+use value::UndefinedValue;
 
 static global_name: [i8, ..7] = ['g' as i8, 'l' as i8, 'o' as i8, 'b' as i8, 'a' as i8, 'l' as i8, 0 as i8];
 pub static BASIC_GLOBAL: JSClass = JSClass {
@@ -108,7 +108,7 @@ pub extern fn debug(cx: *JSContext, argc: c_uint, vp: *mut JSVal) -> JSBool {
             let jsstr = JS_ValueToString(cx, *ptr::offset(argv, i));
             debug!("{:s}", jsval_to_rust_str(cx, jsstr));
         }
-        JS_SET_RVAL(cx, &*vp, JSVAL_VOID);
+        JS_SET_RVAL(cx, &*vp, UndefinedValue().to_jsval());
         return 1_i32;
     }
 }
@@ -116,7 +116,7 @@ pub extern fn debug(cx: *JSContext, argc: c_uint, vp: *mut JSVal) -> JSBool {
 pub extern fn gc(cx: *JSContext, _argc: c_uint, vp: *mut JSVal) -> JSBool {
     unsafe {
         JS_GC(JS_GetRuntime(cx));
-        JS_SET_RVAL(cx, &*vp, JSVAL_VOID);
+        JS_SET_RVAL(cx, &*vp, UndefinedValue().to_jsval());
         return 1;
     }
 }
@@ -127,7 +127,7 @@ pub extern fn assert(cx: *JSContext, argc: c_uint, vp: *mut JSVal) -> JSBool {
         let argv = JS_ARGV(cx, &*vp);
 
         let argument = match argc {
-            0 => JSVAL_VOID,
+            0 => UndefinedValue().to_jsval(),
             _ => *ptr::offset(argv, 0)
         };
 
@@ -149,7 +149,7 @@ pub extern fn assert(cx: *JSContext, argc: c_uint, vp: *mut JSVal) -> JSBool {
             return 0_i32;
         }
 
-        JS_SET_RVAL(cx, &*vp, JSVAL_VOID);
+        JS_SET_RVAL(cx, &*vp, UndefinedValue().to_jsval());
         return 1_i32;
     }
 }

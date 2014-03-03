@@ -14,7 +14,7 @@ use default_heapsize;
 use JSOPTION_VAROBJFIX;
 use JSOPTION_METHODJIT;
 use JSOPTION_TYPE_INFERENCE;
-use JSVAL_NULL;
+use value::NullValue;
 use ERR;
 use std::ptr;
 use std::ptr::null;
@@ -67,10 +67,12 @@ extern fn gc_callback(rt: *JSRuntime, _status: JSGCStatus) {
     unsafe {
         let mut task = Local::borrow(None::<Task>);
         let green_task: ~GreenTask = task.get().maybe_take_runtime().unwrap();
-        let c = green_task.coroutine.get_ref();
-        let start = c.current_stack_segment.start() as uintptr_t;
-        let end = c.current_stack_segment.end() as uintptr_t;
-        JS_SetNativeStackBounds(rt, num::min(start, end), num::max(start, end));
+        {
+            let c = green_task.coroutine.get_ref();
+            let start = c.current_stack_segment.start() as uintptr_t;
+            let end = c.current_stack_segment.end() as uintptr_t;
+            JS_SetNativeStackBounds(rt, num::min(start, end), num::max(start, end));
+        }
         task.get().put_runtime(green_task);
     }
 }
@@ -185,7 +187,7 @@ impl Cx {
                     -> Result<(),()> {
         let script_utf16 = script.to_utf16();
         filename.to_c_str().with_ref(|filename_cstr| {
-            let rval: JSVal = JSVAL_NULL;
+            let rval: JSVal = NullValue().to_jsval();
             debug!("Evaluating script from {:s} with content {}", filename, script);
             unsafe {
                 if ERR == JS_EvaluateUCScript(self.ptr, glob.borrow().ptr,
