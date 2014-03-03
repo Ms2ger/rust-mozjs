@@ -23,6 +23,7 @@ enum ThingRootKind {
 
 pub trait Rootable {
     fn kind() -> ThingRootKind;
+    fn initial -> Self;
     fn poisoned(self) -> bool;
 }
 
@@ -43,22 +44,12 @@ pub struct Rooted<T: Rootable> {
     priv ptr: T,
 }
 
-struct Context {
-    _runtime: *(),
-    _compartment: *(),
-    _zone: *(),
-
-//#ifdef JSGC_TRACK_EXACT_ROOTS
-    /*
-     * Stack allocated GC roots for stack GC heap pointers, which may be
-     * overwritten if moved during a GC.
-     */
-    thingGCRooters: *[Rooted<*()>, ..THING_ROOT_LIMIT as uint],
-//#endif
-}
+fn DoRoot(cx: *JSContext, root: Rooted<T>) {}
+fn DoUnroot(cx: *JSContext, root: Rooted<T>) {}
 
 impl<T> Rooted<T> {
-    priv fn init(&self, cx: &Context) {
+    priv fn new(&self, cx: &Context) {
+        DoRoot(cx, self);
 //#ifdef JSGC_TRACK_EXACT_ROOTS
         //let kind = T::kind();
         //self.stack = &cx.thingGCRooters[kind];
@@ -68,11 +59,15 @@ impl<T> Rooted<T> {
         assert!(!self.ptr.poisoned());
 //#endif
     }
+
+    pub fn new(cx: *JSContext) -> Rooted<T> {
+        let rooted = Rooted<T> {
+            ptr: Rootable::<T>::initial()
+        };
+        rooted
+    }
 }
 /*
-  public:
-    pub fn new(cx: *JSContext) {
-      : ptr(js::GCMethods<T>::initial())
     {
         MOZ_GUARD_OBJECT_NOTIFIER_INIT;
         MOZ_ASSERT(js::IsInRequest(cx));
