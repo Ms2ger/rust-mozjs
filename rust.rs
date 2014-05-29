@@ -70,7 +70,7 @@ extern fn gc_callback(rt: *mut JSRuntime, _status: JSGCStatus, _data: *mut libc:
     use std::rt::task::Task;
     unsafe {
         let mut task = Local::borrow(None::<Task>);
-        let (start, end) = task.get().stack_bounds();
+        let (start, end) = task.stack_bounds();
         JS_SetNativeStackBounds(rt, cmp::min(start, end), cmp::max(start, end));
     }
 }

@@ -787,6 +787,24 @@ CallFunctionValue(JSContext* cx, JS::HandleObject obj, JS::HandleValue fval,
                                 JS::HandleValueArray::fromMarkedLocation(argc, argv), rval);
 }
 
+
+JSObject*
+CompileEventHandler(JSContext* cx, const char* name,
+                    unsigned nargs, const char* const* argnames,
+                    const jschar* chars, size_t length,
+                    const char* url, unsigned lineNo)
+{
+    JS::CompileOptions options(cx);
+    options.setIntroductionType("eventHandler")
+           .setFileAndLine(url, lineNo)
+           .setVersion(JSVERSION_DEFAULT)
+           .setDefineOnScope(false);
+
+    JSFunction* function = JS::CompileFunction(cx, JS::NullPtr(), options, name,
+                                               nargs, argnames, chars, length);
+    return JS_GetFunctionObject(function);
+}
+
 bool
 proxy_LookupGeneric(JSContext *cx, JS::HandleObject obj, JS::HandleId id, JS::MutableHandleObject objp,
                     JS::MutableHandle<js::Shape*> propp)
