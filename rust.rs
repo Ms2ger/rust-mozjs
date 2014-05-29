@@ -17,9 +17,9 @@ use jsapi::{JS_EnterCompartment, JS_LeaveCompartment};
 use jsapi::{JS_SetErrorReporter, JS_NO_HELPER_THREADS};
 use jsapi::{JS_EvaluateUCScript, JS_BeginRequest, JS_EndRequest};
 use jsapi::{JS_NewContext, JSErrorReport, JSJITCOMPILER_ION_ENABLE};
-use jsapi::{JSMutableHandleValue, JS_DestroyRuntime};
+use jsapi::{Handle, MutableHandle, JS_DestroyRuntime};
 use jsapi::{JS_SetGlobalJitCompilerOption, JSJITCOMPILER_BASELINE_ENABLE};
-use jsapi::{JSJITCOMPILER_PARALLEL_COMPILATION_ENABLE, JSHandleObject};
+use jsapi::{JSJITCOMPILER_PARALLEL_COMPILATION_ENABLE};
 use jsval::{JSVal, NullValue};
 //use glue::{CompartmentOptions_SetVersion};
 use glue::{/*CompartmentOptions_SetTraceGlobal,*/ ContextOptions_SetVarObjFix};
@@ -137,10 +137,10 @@ impl Cx {
             let mut rval: JSVal = NullValue();
             debug!("Evaluating script from {:s} with content {}", filename, script);
             unsafe {
-                let globhandle = JSHandleObject {
+                let globhandle = Handle {
                     unnamed_field1: &glob,
                 };
-                let rvalhandle = JSMutableHandleValue {
+                let rvalhandle = MutableHandle {
                     unnamed_field1: &mut rval,
                 };
                 if ERR == JS_EvaluateUCScript(self.ptr, globhandle,
