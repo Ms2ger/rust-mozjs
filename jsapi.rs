@@ -1492,3 +1492,12 @@ pub struct JSHandleScript {
 pub struct JSHandleFunction {
     pub unnamed_field1: *JSFunction,
 }
+
+pub type c_schar = i8;
+
+impl Deref<jsid> for JSHandleId {
+    fn deref<'a>(&'a self) -> &'a jsid {
+        assert!(self.unnamed_field1.is_not_null());
+        unsafe { &*self.unnamed_field1 }
+    }
+}

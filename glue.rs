@@ -139,6 +139,10 @@ pub fn NewGlobalObject(cx: *mut JSContext, clasp: *const JSClass,
 
 pub fn CallFunctionValue(cx: *mut JSContext, obj: JSHandleObject, fval: JSHandleValue,
                          argc: libc::size_t, argv: *JSVal, rval: JSMutableHandleValue) -> bool;
+pub fn CompileEventHandler(cx: *mut JSContext, name: *libc::c_char,
+                           nargs: libc::c_uint, argnames: **libc::c_char,
+                           chars: *u16, length: libc::size_t,
+                           url: *libc::c_char, lineNo: libc::c_uint) -> *JSObject;
 
 pub fn proxy_LookupGeneric(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
                            objp: JSMutableHandleObject, propp: JSMutableHandle<*mut c_void>) -> bool;
