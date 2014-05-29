@@ -1484,6 +1484,14 @@ impl<'a, T> Deref<T> for Handle<'a, T> {
     }
 }
 
+impl<'a, T> MutableHandle<'a, T> {
+    pub fn immut<'b>(&'b self) -> Handle<'b, T> {
+        Handle {
+            unnamed_field1: &*self.unnamed_field1
+        }
+    }
+}
+
 impl<'a, T> Deref<T> for MutableHandle<'a, T> {
     fn deref<'b>(&'b self) -> &'b T {
         &*self.unnamed_field1
