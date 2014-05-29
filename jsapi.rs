@@ -544,7 +544,7 @@ pub struct Struct_JSFunctionSpec {
     pub selfHostedName: *c_schar,
 }
 pub struct Struct_JSPropertyDescriptor {
-    pub obj: *mut c_void,
+    pub obj: *mut JSObject,
     pub attrs: c_uint,
     pub getter: JSPropertyOp,
     pub setter: JSStrictPropertyOp,
@@ -1453,6 +1453,14 @@ pub type c_schar = i8;
 impl<'a, T> Deref<T> for Handle<'a, T> {
     fn deref<'b>(&'b self) -> &'b T {
         &*self.unnamed_field1
+    }
+}
+
+impl<'a, T> MutableHandle<'a, T> {
+    pub fn immut<'b>(&'b self) -> Handle<'b, T> {
+        Handle {
+            unnamed_field1: &*self.unnamed_field1
+        }
     }
 }
 
