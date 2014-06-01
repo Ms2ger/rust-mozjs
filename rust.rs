@@ -23,35 +23,18 @@ use green::task::GreenTask;
 // ___________________________________________________________________________
 // friendly Rustic API to runtimes
 
-pub type rt = rc::Rc<rt_rsrc>;
+pub type runtime = rc::Rc<rt_rsrc>;
 
 pub struct rt_rsrc {
-    pub ptr : *mut JSRuntime,
+    runtime: *mut JSRuntime,
+    context: *mut JSContext,
 }
 
 impl Drop for rt_rsrc {
     fn drop(&mut self) {
         unsafe {
-            JS_Finish(self.ptr);
-        }
-    }
-}
-
-pub fn new_runtime(p: *mut JSRuntime) -> rt {
-    return rc::Rc::new(rt_rsrc {
-        ptr: p
-    })
-}
-
-pub trait RtUtils {
-    fn cx(&self) -> rc::Rc<Cx>;
-}
-
-impl RtUtils for rc::Rc<rt_rsrc> {
-    fn cx(&self) -> rc::Rc<Cx> {
-        unsafe {
-            new_context(JS_NewContext(self.deref().ptr,
-                                      default_stacksize as size_t), self.clone())
+            JS_DestroyContext(self.context);
+            JS_Finish(self.runtime);
         }
     }
 }
@@ -68,67 +51,50 @@ extern fn gc_callback(rt: *mut JSRuntime, _status: JSGCStatus) {
     }
 }
 
-pub fn rt() -> rt {
+pub fn runtime(wrap_for_same_compartment: JSSameCompartmentWrapObjectCallback,
+               pre_wrap: JSPreWrapCallback) -> runtime {
     unsafe {
         let runtime = JS_Init(default_heapsize);
+        assert!(runtime.is_not_null());
+
         JS_SetGCCallback(runtime, Some(gc_callback));
-        return new_runtime(runtime);
+
+        // JS_SetWrapObjectCallbacks clobbers the existing wrap callback,
+        // and JSCompartment::wrap crashes if that happens. The only way
+        // to retrieve the default callback is as the result of
+        // JS_SetWrapObjectCallbacks, which is why we call it twice.
+        let callback = JS_SetWrapObjectCallbacks(runtime,
+                                                 None,
+                                                 wrap_for_same_compartment,
+                                                 None);
+        JS_SetWrapObjectCallbacks(runtime,
+                                  callback,
+                                  wrap_for_same_compartment,
+                                  pre_wrap);
+
+        let context = JS_NewContext(runtime, default_stacksize as size_t);
+        assert!(context.is_not_null());
+
+        JS_SetOptions(context, JSOPTION_VAROBJFIX | JSOPTION_METHODJIT |
+                               JSOPTION_TYPE_INFERENCE);
+        JS_SetVersion(context, JSVERSION_LATEST);
+        JS_SetErrorReporter(context, Some(reportError));
+        JS_SetGCZeal(context, 0, JS_DEFAULT_ZEAL_FREQ);
+
+        rc::Rc::new(rt_rsrc {
+            runtime: runtime,
+            context: context,
+        })
     }
 }
 
-// ___________________________________________________________________________
-// contexts
-
-pub struct Cx {
-    pub ptr: *mut JSContext,
-    pub rt: rt,
-}
-
-#[unsafe_destructor]
-impl Drop for Cx {
-    fn drop(&mut self) {
-        unsafe {
-            JS_DestroyContext(self.ptr);
-        }
-    }
-}
-
-pub fn new_context(ptr: *mut JSContext, rt: rt) -> rc::Rc<Cx> {
-    return rc::Rc::new(Cx {
-        ptr: ptr,
-        rt: rt,
-    })
-}
-
-impl Cx {
-    pub fn set_default_options_and_version(&self) {
-        self.set_options(JSOPTION_VAROBJFIX | JSOPTION_METHODJIT |
-                         JSOPTION_TYPE_INFERENCE);
-        self.set_version(JSVERSION_LATEST);
+impl rt_rsrc {
+    pub fn context(&self) -> *mut JSContext {
+        self.context
     }
 
-    pub fn set_options(&self, v: c_uint) {
-        unsafe {
-            JS_SetOptions(self.ptr, v);
-        }
-    }
-
-    pub fn set_version(&self, v: JSVersion) {
-        unsafe {
-            JS_SetVersion(self.ptr, v);
-        }
-    }
-
-    pub fn set_logging_error_reporter(&self) {
-        unsafe {
-            JS_SetErrorReporter(self.ptr, Some(reportError));
-        }
-    }
-
-    pub fn set_error_reporter(&self, reportfn: extern "C" unsafe fn(*mut JSContext, *c_char, *mut JSErrorReport)) {
-        unsafe {
-            JS_SetErrorReporter(self.ptr, Some(reportfn));
-        }
+    pub fn runtime(&self) -> *mut JSRuntime {
+        self.runtime
     }
 
     pub fn evaluate_script(&self, glob: *mut JSObject, script: ~str, filename: ~str, line_num: uint)
@@ -138,7 +104,7 @@ impl Cx {
             let mut rval: JSVal = NullValue();
             debug!("Evaluating script from {:s} with content {}", filename, script);
             unsafe {
-                if ERR == JS_EvaluateUCScript(self.ptr, glob,
+                if ERR == JS_EvaluateUCScript(self.context, glob,
                                               script_utf16.as_ptr(), script_utf16.len() as c_uint,
                                               filename_cstr, line_num as c_uint,
                                               &mut rval) {
@@ -172,19 +138,4 @@ pub fn with_compartment<R>(cx: *mut JSContext, object: *mut JSObject, cb: || -> 
         JS_LeaveCrossCompartmentCall(call);
         result
     }
-}
-
-#[cfg(test)]
-pub mod test {
-    use super::rt;
-    use super::RtUtils;
-
-    #[test]
-    pub fn dummy() {
-        let rt = rt();
-        let cx = rt.cx();
-        cx.deref().set_default_options_and_version();
-        cx.deref().set_logging_error_reporter();
-    }
-
 }
