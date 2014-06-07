@@ -4,8 +4,8 @@
 
 use jsapi::{JSObject, JSString, Struct_Unnamed1, JSGCTraceKind, JSTRACE_OBJECT, JSTRACE_STRING};
 
-use libc::c_void, uint64_t, c_double, size_t, uintptr_t;
 use std::mem;
+use libc::{c_void, uint64_t, c_double, size_t, uintptr_t};
 
 #[cfg(target_word_size = "64")]
 static JSVAL_TAG_SHIFT: uint = 47u;

@@ -149,7 +149,7 @@ fn start(argc: int, argv: *const *const u8) -> int {
 }
 
 // Up-to-date mozjs 075904f5f7ee1176f28630d1dff47820020e5928
-pub type JSObjectOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject) -> *mut JSObject>;
+pub type JSObjectOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject) -> *mut JSObject>;
 pub type ClassObjectCreationOp = Option<extern "C" fn(*mut JSContext, Enum_JSProtoKey) -> *mut JSObject>;
 pub type FinishClassInitOp = Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject) -> bool>;
 
@@ -197,43 +197,43 @@ pub struct ClassExtension {
     pub weakmapKeyDelegateOp: JSWeakmapKeyDelegateOp,
 }
 
-pub type LookupGenericOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleId,
+pub type LookupGenericOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId,
                                                        JSMutableHandleObject, MutableHandle<*mut c_void>) -> bool>;
-pub type LookupPropOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, Handle<*mut c_void>,
+pub type LookupPropOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, Handle<*mut c_void>,
                                                     JSMutableHandleObject, MutableHandle<*mut c_void>) -> bool>;
-pub type LookupElementOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, u32,
+pub type LookupElementOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, u32,
                                                        JSMutableHandleObject, MutableHandle<*mut c_void>) -> bool>;
-pub type DefineGenericOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleId,
+pub type DefineGenericOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId,
                                                        JSHandleValue, JSPropertyOp, JSStrictPropertyOp,
                                                        uint) -> bool>;
-pub type DefinePropOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, Handle<*mut c_void>,
+pub type DefinePropOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, Handle<*mut c_void>,
                                                     JSHandleValue, JSPropertyOp, JSStrictPropertyOp,
                                                     uint) -> bool>;
-pub type DefineElementOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, u32, JSHandleValue,
+pub type DefineElementOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, u32, JSHandleValue,
                                                        JSPropertyOp, JSStrictPropertyOp, uint) -> bool>;
-pub type GenericIdOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleObject,
+pub type GenericIdOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject,
                                                    JSHandleId, JSMutableHandleValue) -> bool>;
-pub type PropertyIdOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleObject,
+pub type PropertyIdOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject,
                                                     Handle<*mut c_void>, JSMutableHandleValue) -> bool>;
-pub type ElementIdOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleObject,
+pub type ElementIdOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject,
                                                    u32, JSMutableHandleValue) -> bool>;
-pub type StrictGenericIdOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleId,
+pub type StrictGenericIdOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId,
                                                          JSMutableHandleValue, bool) -> bool>;
-pub type StrictPropertyIdOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject,
+pub type StrictPropertyIdOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject,
                                                           Handle<*mut c_void>, JSMutableHandleValue,
                                                           bool) -> bool>;
-pub type StrictElementIdOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, u32,
+pub type StrictElementIdOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, u32,
                                                          JSMutableHandleValue, bool) -> bool>;
-pub type GenericAttributesOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleId,
+pub type GenericAttributesOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId,
                                                            *mut uint) -> bool>;
-pub type PropertyAttributesOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject,
+pub type PropertyAttributesOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject,
                                                             Handle<*mut c_void>, *mut uint) -> bool>;
-pub type DeletePropertyOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject,
+pub type DeletePropertyOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject,
                                                         Handle<*mut c_void>, *mut bool) -> bool>;
-pub type DeleteElementOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, u32, *mut bool) -> bool>;
-pub type WatchOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleId, JSHandleObject) -> bool>;
-pub type UnwatchOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, JSHandleId) -> bool>;
-pub type SliceOp = Option<extern "C" unsafe fn(*mut JSContext, JSHandleObject, u32, u32, JSHandleObject) -> bool>;
+pub type DeleteElementOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, u32, *mut bool) -> bool>;
+pub type WatchOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, JSHandleObject) -> bool>;
+pub type UnwatchOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId) -> bool>;
+pub type SliceOp = Option<unsafe extern "C" fn(*mut JSContext, JSHandleObject, u32, u32, JSHandleObject) -> bool>;
 
 pub struct ObjectOps {
     pub lookupGeneric: LookupGenericOp,

@@ -162,25 +162,25 @@ pub type JSWhyMagic = Enum_JSWhyMagic;
 }
 impl Union_jsval_layout {
     pub fn asBits(&mut self) -> *mut uint64_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn debugView(&mut self) -> *mut Struct_Unnamed1 {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn s(&mut self) -> *mut Struct_Unnamed2 {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asDouble(&mut self) -> *mut c_double {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asPtr(&mut self) -> *mut *mut c_void {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asWord(&mut self) -> *mut size_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asUIntPtr(&mut self) -> *mut uintptr_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }*/
 pub struct Struct_Unnamed1 {
@@ -195,13 +195,13 @@ pub struct Union_Unnamed3 {
 }
 impl Union_Unnamed3 {
     pub fn i32(&mut self) -> *mut int32_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn u32(&mut self) -> *mut uint32_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn why(&mut self) -> *mut JSWhyMagic {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub type jsval_layout = Union_jsval_layout;
@@ -296,7 +296,7 @@ pub type JSIteratorOp =
                               -> *mut JSObject>;
 // Up-to-date mozjs 075904f5f7ee1176f28630d1dff47820020e5928
 pub type JSWeakmapKeyDelegateOp =
-    ::std::option::Option<extern "C" unsafe fn (arg1: *mut JSObject) -> *mut JSObject>; //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" unsafe fn (arg1: *mut JSObject) -> *mut JSObject>; //jdm +unsafe
 // Up-to-date mozjs 075904f5f7ee1176f28630d1dff47820020e5928
 pub type JSClassInternal = ::std::option::Option<extern "C" fn()>;
 // Up-to-date mozjs 075904f5f7ee1176f28630d1dff47820020e5928
