@@ -162,25 +162,25 @@ pub type JSWhyMagic = Enum_JSWhyMagic;
 }
 impl Union_jsval_layout {
     pub fn asBits(&mut self) -> *mut uint64_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn debugView(&mut self) -> *mut Struct_Unnamed1 {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn s(&mut self) -> *mut Struct_Unnamed2 {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asDouble(&mut self) -> *mut c_double {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asPtr(&mut self) -> *mut *mut c_void {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asWord(&mut self) -> *mut size_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn asUIntPtr(&mut self) -> *mut uintptr_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }*/
 pub struct Struct_Unnamed1 {
@@ -195,13 +195,13 @@ pub struct Union_Unnamed3 {
 }
 impl Union_Unnamed3 {
     pub fn i32(&mut self) -> *mut int32_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn u32(&mut self) -> *mut uint32_t {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn why(&mut self) -> *mut JSWhyMagic {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub type jsval_layout = Union_jsval_layout;
@@ -222,74 +222,74 @@ pub struct Struct_jsid {
     asBits: size_t,
 }
 pub type JSPropertyOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: HandleId,
                                arg4: MutableHandleValue) -> c_int>;
 pub type JSStrictPropertyOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: HandleId,
                                arg4: c_int, arg5: MutableHandleValue)
                               -> c_int>;
 pub type JSDeletePropertyOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: HandleId,
                                arg4: *mut c_int) -> c_int>;
 pub type JSNewEnumerateOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: Enum_JSIterateOp,
                                arg4: MutableHandleValue,
                                arg5: MutableHandleId) -> c_int>;
 pub type JSEnumerateOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject) -> c_int>;
 pub type JSResolveOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: HandleId) -> c_int>;
 pub type JSNewResolveOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: HandleId,
                                arg4: c_uint, arg5: MutableHandleObject)
                               -> c_int>;
 pub type JSConvertOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: Enum_JSType,
                                arg4: MutableHandleValue) -> c_int>;
 pub type JSFinalizeOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSFreeOp,
                                arg2: *mut c_void)>;
 pub struct Struct_JSStringFinalizer {
-    finalize: ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    finalize: ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                                         (arg1: *Struct_JSStringFinalizer,
                                          arg2: *mut jschar)>,
 }
 pub type JSHasInstanceOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: MutableHandleValue,
                                arg4: *mut c_int) -> c_int>;
 pub type JSTraceOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut JSTracer, arg2: *mut JSObject)>; //jdm c_void->...
 pub type JSObjectOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject) -> *mut c_void>;
 pub type JSIteratorOp =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext,
                                arg2: HandleObject, arg3: c_int)
                               -> *mut c_void>;
 pub type JSWeakmapKeyDelegateOp =
-    ::std::option::Option<extern "C" unsafe fn (arg1: *mut c_void) -> *mut c_void>; //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn (arg1: *mut c_void) -> *mut c_void>; //jdm +unsafe
 pub type JSClassInternal = ::std::option::Option<extern "C" fn()>;
 pub struct Struct_JSClass {
     pub name: *c_schar,
@@ -368,7 +368,7 @@ pub type JSInterruptCallback =
     ::std::option::Option<extern "C" fn(arg1: *mut Struct_JSContext)
                               -> c_int>;
 pub type JSErrorReporter =
-    ::std::option::Option<extern "C" unsafe fn //jdm +unsafe
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext, arg2: *c_schar,
                                arg3: *mut Struct_JSErrorReport)>;
 pub type Enum_JSExnType = c_int;
@@ -519,10 +519,10 @@ pub struct Union_Unnamed4 {
 }
 impl Union_Unnamed4 {
     pub fn propertyOp(&mut self) -> *mut JSPropertyOpWrapper {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn selfHosted(&mut self) -> *mut Struct_SelfHostedWrapper {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub struct Union_Unnamed5 {
@@ -530,10 +530,10 @@ pub struct Union_Unnamed5 {
 }
 impl Union_Unnamed5 {
     pub fn propertyOp(&mut self) -> *mut JSStrictPropertyOpWrapper {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn selfHosted(&mut self) -> *mut Struct_SelfHostedWrapper {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub struct Struct_JSFunctionSpec {

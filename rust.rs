@@ -124,13 +124,13 @@ impl Cx {
         }
     }
 
-    pub fn set_error_reporter(&self, reportfn: extern "C" unsafe fn(*mut JSContext, *c_char, *mut JSErrorReport)) {
+    pub fn set_error_reporter(&self, reportfn: unsafe extern "C" fn(*mut JSContext, *c_char, *mut JSErrorReport)) {
         unsafe {
             JS_SetErrorReporter(self.ptr, Some(reportfn));
         }
     }
 
-    pub fn evaluate_script(&self, glob: *mut JSObject, script: ~str, filename: ~str, line_num: uint)
+    pub fn evaluate_script(&self, glob: *mut JSObject, script: &str, filename: &str, line_num: uint)
                     -> Result<(),()> {
         let script_utf16 = script.to_utf16();
         filename.to_c_str().with_ref(|filename_cstr| {
