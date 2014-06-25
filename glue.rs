@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use jsapi::{JSContext, JSPropertyDescriptor};
+use jsapi::{JSContext, JSPropertyDescriptor, jschar};
 use jsapi::{JSTracer, JSFunction, JSNative, JSErrorFormatString, JSFreeOp};
 use jsapi::{JSClass, JSString, JSObject, jsid, JSVersion, JSTraceOp};
 use jsapi::{Enum_OnNewGlobalHookOption, JSPrincipals, Enum_JSType, Struct_JSFreeOp};
@@ -135,6 +135,11 @@ pub fn NewGlobalObject(cx: *mut JSContext, clasp: *const JSClass,
 
 pub fn CallFunctionValue(cx: *mut JSContext, obj: JSHandleObject, fval: JSHandleValue,
                          argc: libc::size_t, argv: *JSVal, rval: JSMutableHandleValue) -> bool;
+pub fn CompileUCFunction(cx: *mut JSContext, obj: JSHandleObject,
+                         name: *libc::c_schar, nargs: libc::c_uint,
+                         argnames: **libc::c_schar, chars: *jschar,
+                         length: libc::size_t, url: *libc::c_schar,
+                         lineno: libc::c_uint) -> *mut c_void;
 pub fn CompileEventHandler(cx: *mut JSContext, name: *libc::c_char,
                            nargs: libc::c_uint, argnames: **libc::c_char,
                            chars: *u16, length: libc::size_t,

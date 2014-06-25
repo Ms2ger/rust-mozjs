@@ -207,7 +207,7 @@ impl Union_Unnamed3 {
 pub type jsval_layout = Union_jsval_layout;
 //pub type jsval = c_void; //jdm
 pub type JSNative =
-    ::std::option::Option<extern "C" fn
+    ::std::option::Option<unsafe extern "C" fn //jdm +unsafe
                               (arg1: *mut Struct_JSContext, arg2: c_uint,
                                arg3: *mut jsval) -> c_int>; //jdm c_void->jsval
 pub type JSParallelNative =
@@ -1003,7 +1003,7 @@ extern "C" {
                                        flags: c_uint, desc: c_void) -> c_int;
     pub fn JS_GetPropertyDescriptorById(cx: *mut Struct_JSContext,
                                         obj: HandleObject, id: HandleId,
-                                        flags: c_uint, desc: MutableHandle<JSPropertyDescriptor>) -> c_int; //jdm c_void->JSMutableHandle
+                                        flags: c_uint, desc: MutableHandle<*mut JSPropertyDescriptor>) -> c_int; //jdm c_void->JSMutableHandle
     pub fn JS_GetPropertyDescriptor(cx: *mut Struct_JSContext,
                                     obj: HandleObject, name: *c_schar,
                                     flags: c_uint, desc: c_void) -> c_int;
@@ -1122,7 +1122,7 @@ extern "C" {
     pub fn JS_NewFunctionById(cx: *mut Struct_JSContext, call: JSNative,
                               nargs: c_uint, flags: c_uint, parent: c_void,
                               id: c_void) -> *mut c_void;
-    pub fn JS_GetFunctionObject(fun: *mut c_void) -> *mut c_void;
+    pub fn JS_GetFunctionObject(fun: *mut c_void) -> *mut JSObject; //jdm c_void->JSObject
     pub fn JS_GetFunctionId(fun: *mut c_void) -> *mut c_void;
     pub fn JS_GetFunctionDisplayId(fun: *mut c_void) -> *mut c_void;
     pub fn JS_GetFunctionArity(fun: *mut c_void) -> uint16_t;
@@ -1145,8 +1145,8 @@ extern "C" {
     pub fn JS_DefineFunctionById(cx: *mut Struct_JSContext, obj: c_void,
                                  id: c_void, call: JSNative, nargs: c_uint,
                                  attrs: c_uint) -> *mut c_void;
-    pub fn JS_CloneFunctionObject(cx: *mut Struct_JSContext, funobj: c_void,
-                                  parent: c_void) -> *mut c_void;
+    pub fn JS_CloneFunctionObject(cx: *mut Struct_JSContext, funobj: JSHandleObject,
+                                  parent: JSHandleObject) -> *mut c_void; //jdm +handles
     pub fn JS_BufferIsCompilableUnit(cx: *mut Struct_JSContext, obj: c_void,
                                      utf8: *c_schar, length: size_t) -> c_int;
     pub fn JS_CompileScript(cx: *mut Struct_JSContext, obj: HandleObject,

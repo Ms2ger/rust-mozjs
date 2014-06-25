@@ -774,6 +774,15 @@ CallFunctionValue(JSContext* cx, JS::HandleObject obj, JS::HandleValue fval,
                                 JS::HandleValueArray::fromMarkedLocation(argc, argv), rval);
 }
 
+JSFunction*
+CompileUCFunction(JSContext *cx, JS::HandleObject obj, const char *name,
+                  unsigned nargs, const char *const *argnames,
+                  const jschar *chars, size_t length, const char *url, unsigned lineno)
+{
+    JS::CompileOptions opts(cx);
+    opts.setFileAndLine(url, lineno);
+    return JS_CompileUCFunction(cx, obj, name, nargs, argnames, chars, length, opts);
+}
 
 JSObject*
 CompileEventHandler(JSContext* cx, const char* name,
