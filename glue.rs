@@ -143,7 +143,7 @@ pub fn CompileUCFunction(cx: *mut JSContext, obj: JSHandleObject,
 pub fn CompileEventHandler(cx: *mut JSContext, name: *libc::c_char,
                            nargs: libc::c_uint, argnames: **libc::c_char,
                            chars: *u16, length: libc::size_t,
-                           url: *libc::c_char, lineNo: libc::c_uint) -> *JSObject;
+                           url: *libc::c_char, lineNo: libc::c_uint) -> *mut JSObject;
 
 pub fn proxy_LookupGeneric(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
                            objp: JSMutableHandleObject, propp: MutableHandle<*mut c_void>) -> bool;
