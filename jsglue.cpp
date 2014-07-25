@@ -8,6 +8,8 @@
 #include "jsfriendapi.h"
 #include "jsproxy.h"
 #include "jswrapper.h"
+#include "mozilla/LinkedList.h"
+#include "js/TypeDecls.h"
 
 #include "assert.h"
 
@@ -998,6 +1000,20 @@ objectRelocate(JSObject** obj)
 #ifdef JSGC_GENERATIONAL
     return js::GCMethods<JSObject*>::postBarrier(obj);
 #endif
+}
+
+mozilla::LinkedList<JS::PersistentRootedObject>*
+getPersistentRootedObjectList(JSRuntime* rt)
+{
+    JS::shadow::Runtime *srt = JS::shadow::Runtime::asShadowRuntime(rt);
+    return &srt->getPersistentRootedList<JSObject*>();
+}
+
+void
+insertObjectLinkedListElement(mozilla::LinkedList<JS::PersistentRootedObject>* list,
+                              JS::PersistentRootedObject* elem)
+{
+    list->insertBack(elem);
 }
 
 } // extern "C"
