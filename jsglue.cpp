@@ -1002,6 +1002,12 @@ objectRelocate(JSObject** obj)
 #endif
 }
 
+bool
+objectIsPoisoned(JSObject* obj)
+{
+    return js::GCMethods<JSObject*>::poisoned(obj);
+}
+
 mozilla::LinkedList<JS::PersistentRootedObject>*
 getPersistentRootedObjectList(JSRuntime* rt)
 {
