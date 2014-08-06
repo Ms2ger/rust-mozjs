@@ -16,36 +16,35 @@ use jsval::JSVal;
 use libc;
 use libc::c_void;
 
-pub type c_bool = libc::c_int;
-pub type JSBool = c_bool;
+pub type JSBool = libc::c_int;
 
 pub struct ProxyTraps {
-    pub preventExtensions: Option<extern "C" fn(*mut JSContext, JSHandleObject) -> c_bool>,
-    pub getPropertyDescriptor: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, MutableHandle<JSPropertyDescriptor>, u32) -> c_bool>,
-    pub getOwnPropertyDescriptor: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, MutableHandle<JSPropertyDescriptor>, u32) -> c_bool>,
-    pub defineProperty: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, MutableHandle<JSPropertyDescriptor>) -> c_bool>,
+    pub preventExtensions: Option<extern "C" fn(*mut JSContext, JSHandleObject) -> bool>,
+    pub getPropertyDescriptor: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, MutableHandle<JSPropertyDescriptor>, libc::c_uint) -> bool>,
+    pub getOwnPropertyDescriptor: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, MutableHandle<JSPropertyDescriptor>, libc::c_uint) -> bool>,
+    pub defineProperty: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, MutableHandle<JSPropertyDescriptor>) -> bool>,
     pub getOwnPropertyNames: *const u8, //XXX need a representation for AutoIdVector&
-    pub delete_: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, *mut bool) -> JSBool>,
+    pub delete_: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, *mut bool) -> bool>,
     pub enumerate: *const u8, //XXX need a representation for AutoIdVector&
 
-    pub has: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, *mut JSBool) -> JSBool>,
-    pub hasOwn: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, *mut c_bool) -> c_bool>,
-    pub get: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject, JSHandleId, JSMutableHandleValue) -> c_bool>,
-    pub set: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject, JSHandleId, JSBool, JSMutableHandleValue) -> JSBool>,
+    pub has: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, *mut bool) -> bool>,
+    pub hasOwn: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleId, *mut bool) -> bool>,
+    pub get: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject, JSHandleId, JSMutableHandleValue) -> bool>,
+    pub set: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSHandleObject, JSHandleId, bool, JSMutableHandleValue) -> bool>,
     pub keys: *const u8, //XXX need a representation for AutoIdVector&
-    pub iterate: Option<extern "C" fn(*mut JSContext, JSHandleObject, uint, JSMutableHandleValue) -> JSBool>,
+    pub iterate: Option<extern "C" fn(*mut JSContext, JSHandleObject, libc::c_uint, JSMutableHandleValue) -> bool>,
 
-    pub isExtensible: Option<extern "C" fn(*mut JSContext, JSHandleObject, *mut c_bool) -> c_bool>,
-    pub call: Option<extern "C" fn(*mut JSContext, JSHandleObject, uint, JSMutableHandleValue) -> JSBool>,
-    pub construct: Option<extern "C" fn(*mut JSContext, JSHandleObject, uint, JSMutableHandleValue, JSMutableHandleValue) -> JSBool>,
+    pub isExtensible: Option<extern "C" fn(*mut JSContext, JSHandleObject, *mut bool) -> bool>,
+    pub call: Option<extern "C" fn(*mut JSContext, JSHandleObject, libc::c_uint, JSMutableHandleValue) -> bool>,
+    pub construct: Option<extern "C" fn(*mut JSContext, JSHandleObject, uint, JSMutableHandleValue, JSMutableHandleValue) -> bool>,
     pub nativeCall: *const u8, //XXX need a representation for IsAcceptableThis, NativeImpl, and CallArgs
-    pub hasInstance: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSMutableHandleValue, *mut JSBool) -> JSBool>,
-    pub objectClassIs: Option<extern "C" fn(JSHandleObject, uint, *mut JSContext) -> JSBool>, //XXX ESClassValue enum
-    pub fun_toString: Option<extern "C" fn(*mut JSContext, JSHandleObject, uint) -> *JSString>,
+    pub hasInstance: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSMutableHandleValue, *mut bool) -> bool>,
+    pub objectClassIs: Option<extern "C" fn(JSHandleObject, libc::c_uint, *mut JSContext) -> bool>, //XXX ESClassValue enum
+    pub fun_toString: Option<extern "C" fn(*mut JSContext, JSHandleObject, libc::c_uint) -> *mut JSString>,
     //regexp_toShared: *u8,
-    pub defaultValue: Option<extern "C" fn(*mut JSContext, JSHandleObject, Enum_JSType, JSMutableHandleValue) -> JSBool>, //XXX JSType enum
+    pub defaultValue: Option<extern "C" fn(*mut JSContext, JSHandleObject, Enum_JSType, JSMutableHandleValue) -> bool>,
     pub finalize: Option<extern "C" fn(*mut JSFreeOp, *mut JSObject)>,
-    pub getPrototypeOf: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSMutableHandleObject) -> c_bool>,
+    pub getPrototypeOf: Option<extern "C" fn(*mut JSContext, JSHandleObject, JSMutableHandleObject) -> bool>,
     pub trace: Option<extern "C" fn(*mut JSTracer, *mut JSObject)>
 }
 
@@ -64,34 +63,34 @@ extern {
 
 pub fn RUST_JS_NumberValue(d: f64) -> JSVal;
 
-pub fn CallJitSetterOp(info: *const JSJitInfo, cx: *mut JSContext, thisObj: JSHandleObject, specializedThis: *const libc::c_void, vp: *mut JSVal) -> c_bool;
+pub fn CallJitSetterOp(info: *const JSJitInfo, cx: *mut JSContext, thisObj: JSHandleObject, specializedThis: *const libc::c_void, vp: *mut JSVal) -> bool;
 
-pub fn CallJitGetterOp(info: *const JSJitInfo, cx: *mut JSContext, thisObj: JSHandleObject, specializedThis: *const libc::c_void, vp: *mut JSVal) -> c_bool;
+pub fn CallJitGetterOp(info: *const JSJitInfo, cx: *mut JSContext, thisObj: JSHandleObject, specializedThis: *const libc::c_void, vp: *mut JSVal) -> bool;
 
-pub fn CallJitMethodOp(info: *const JSJitInfo, cx: *mut JSContext, thisObj: JSHandleObject, specializedThis: *const libc::c_void, argc: libc::c_uint, vp: *mut JSVal) -> c_bool;
+pub fn CallJitMethodOp(info: *const JSJitInfo, cx: *mut JSContext, thisObj: JSHandleObject, specializedThis: *const libc::c_void, argc: libc::c_uint, vp: *mut JSVal) -> bool;
 
 pub fn RUST_FUNCTION_VALUE_TO_JITINFO(v: JSVal) -> *const JSJitInfo;
 
-pub fn SetFunctionNativeReserved(fun: *mut JSObject, which: libc::size_t, val: *JSVal);
-pub fn GetFunctionNativeReserved(fun: *mut JSObject, which: libc::size_t) -> *JSVal;
+pub fn SetFunctionNativeReserved(fun: *mut JSObject, which: libc::size_t, val: *const JSVal);
+pub fn GetFunctionNativeReserved(fun: *mut JSObject, which: libc::size_t) -> *const JSVal;
 
 pub fn CreateProxyHandler(traps: *const ProxyTraps, extra: *const libc::c_void) -> *const libc::c_void;
 pub fn CreateWrapperProxyHandler(traps: *const ProxyTraps) -> *const libc::c_void;
-pub fn NewProxyObject(cx: *mut JSContext, handler: *const libc::c_void, clasp: *const super::Class,
+pub fn NewProxyObject(cx: *mut JSContext, handler: *const libc::c_void, clasp: */*const*/mut super::Class,
                       priv_: JSHandleValue, proto: *mut JSObject, parent: *mut JSObject) -> *mut JSObject;
 pub fn WrapperNew(cx: *mut JSContext, obj: JSHandleObject, parent: JSHandleObject,
-                  handler: *const libc::c_void, clasp: *const super::Class, singleton: bool) -> *mut JSObject;
+                  handler: *const libc::c_void, clasp: */*const*/mut super::Class, singleton: bool) -> *mut JSObject;
 
 pub fn GetProxyExtra(obj: *mut JSObject, slot: libc::c_uint) -> JSVal;
 pub fn GetProxyPrivate(obj: *mut JSObject) -> JSVal;
 pub fn SetProxyExtra(obj: *mut JSObject, slot: libc::c_uint, val: JSVal);
 
-pub fn GetObjectProto(cx: *mut JSContext, obj: JSHandleObject, proto: JSMutableHandleObject) -> c_bool;
+pub fn GetObjectProto(cx: *mut JSContext, obj: JSHandleObject, proto: JSMutableHandleObject) -> bool;
 pub fn GetObjectParent(obj: *mut JSObject) -> *mut JSObject;
 
-pub fn RUST_JSID_IS_INT(id: jsid) -> c_bool;
+pub fn RUST_JSID_IS_INT(id: jsid) -> bool;
 pub fn RUST_JSID_TO_INT(id: jsid) -> libc::c_int;
-pub fn RUST_JSID_IS_STRING(id: jsid) -> c_bool;
+pub fn RUST_JSID_IS_STRING(id: jsid) -> bool;
 pub fn RUST_JSID_TO_STRING(id: jsid) -> *mut JSString;
 
 pub fn RUST_SET_JITINFO(func: *mut JSFunction, info: *const JSJitInfo);
@@ -107,7 +106,7 @@ pub fn RUST_js_GetErrorMessage(userRef: *mut libc::c_void, locale: *const libc::
 pub fn IsProxyHandlerFamily(obj: *mut JSObject) -> bool;
 pub fn GetProxyHandlerExtra(obj: *mut JSObject) -> *const libc::c_void;
 pub fn GetProxyHandler(obj: *mut JSObject) -> *mut libc::c_void;
-pub fn InvokeGetOwnPropertyDescriptor(handler: *mut libc::c_void, cx: *mut JSContext, proxy: JSHandleObject, id: JSHandleId, desc: MutableHandle<JSPropertyDescriptor>, flags: libc::c_uint) -> c_bool;
+pub fn InvokeGetOwnPropertyDescriptor(handler: *mut libc::c_void, cx: *mut JSContext, proxy: JSHandleObject, id: JSHandleId, desc: MutableHandle<JSPropertyDescriptor>, flags: libc::c_uint) -> bool;
 pub fn GetGlobalForObjectCrossCompartment(obj: *mut JSObject) -> *mut JSObject;
 pub fn ReportError(cx: *mut JSContext, error: *const libc::c_char);
 pub fn IsWrapper(obj: *mut JSObject) -> JSBool;
@@ -134,16 +133,16 @@ pub fn NewGlobalObject(cx: *mut JSContext, clasp: *const JSClass,
                        hookOption: Enum_OnNewGlobalHookOption) -> *mut JSObject;
 
 pub fn CallFunctionValue(cx: *mut JSContext, obj: JSHandleObject, fval: JSHandleValue,
-                         argc: libc::size_t, argv: *JSVal, rval: JSMutableHandleValue) -> bool;
+                         argc: libc::size_t, argv: *const JSVal, rval: JSMutableHandleValue) -> bool;
 pub fn CompileUCFunction(cx: *mut JSContext, obj: JSHandleObject,
-                         name: *libc::c_schar, nargs: libc::c_uint,
-                         argnames: **libc::c_schar, chars: *jschar,
-                         length: libc::size_t, url: *libc::c_schar,
+                         name: *const libc::c_schar, nargs: libc::c_uint,
+                         argnames: *const *const libc::c_schar, chars: *const jschar,
+                         length: libc::size_t, url: *const libc::c_schar,
                          lineno: libc::c_uint) -> *mut c_void;
-pub fn CompileEventHandler(cx: *mut JSContext, name: *libc::c_char,
-                           nargs: libc::c_uint, argnames: **libc::c_char,
-                           chars: *u16, length: libc::size_t,
-                           url: *libc::c_char, lineNo: libc::c_uint) -> *mut JSObject;
+pub fn CompileEventHandler(cx: *mut JSContext, name: *const libc::c_char,
+                           nargs: libc::c_uint, argnames: *const *const libc::c_char,
+                           chars: *const u16, length: libc::size_t,
+                           url: *const libc::c_char, lineNo: libc::c_uint) -> *mut JSObject;
 
 pub fn proxy_LookupGeneric(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
                            objp: JSMutableHandleObject, propp: MutableHandle<*mut c_void>) -> bool;
@@ -153,13 +152,13 @@ pub fn proxy_LookupElement(cx: *mut JSContext, obj: JSHandleObject, index: u32,
                            objp: JSMutableHandleObject, propp: MutableHandle<*mut c_void>) -> bool;
 pub fn proxy_DefineGeneric(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
                            value: JSHandleValue, getter: JSPropertyOp,
-                           setter: JSStrictPropertyOp, attrs: uint) -> bool;
+                           setter: JSStrictPropertyOp, attrs: libc::c_uint) -> bool;
 pub fn proxy_DefineProperty(cx: *mut JSContext, obj: JSHandleObject, name: Handle<*mut c_void>,
                            value: JSHandleValue, getter: JSPropertyOp,
-                           setter: JSStrictPropertyOp, attrs: uint) -> bool;
+                           setter: JSStrictPropertyOp, attrs: libc::c_uint) -> bool;
 pub fn proxy_DefineElement(cx: *mut JSContext, obj: JSHandleObject, index: u32,
                            value: JSHandleValue, getter: JSPropertyOp,
-                           setter: JSStrictPropertyOp, attrs: uint) -> bool;
+                           setter: JSStrictPropertyOp, attrs: libc::c_uint) -> bool;
 pub fn proxy_GetGeneric(cx: *mut JSContext, obj: JSHandleObject, receiver: JSHandleObject,
                         id: JSHandleId, vp: JSMutableHandleValue) -> bool;
 pub fn proxy_GetProperty(cx: *mut JSContext, obj: JSHandleObject, receiver: JSHandleObject,
@@ -173,9 +172,9 @@ pub fn proxy_SetProperty(cx: *mut JSContext, obj: JSHandleObject, name: Handle<*
 pub fn proxy_SetElement(cx: *mut JSContext, obj: JSHandleObject, index: u32,
                         vp: JSMutableHandleValue, strict: bool) -> bool;
 pub fn proxy_GetGenericAttributes(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
-                                  attrsp: *mut uint) -> bool;
+                                  attrsp: *mut libc::c_uint) -> bool;
 pub fn proxy_SetGenericAttributes(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
-                                  attrsp: *mut uint) -> bool;
+                                  attrsp: *mut libc::c_uint) -> bool;
 pub fn proxy_DeleteProperty(cx: *mut JSContext, obj: JSHandleObject, name: Handle<*mut c_void>,
                             succeeded: *mut bool) -> bool;
 pub fn proxy_DeleteElement(cx: *mut JSContext, obj: JSHandleObject, index: u32,
@@ -183,12 +182,12 @@ pub fn proxy_DeleteElement(cx: *mut JSContext, obj: JSHandleObject, index: u32,
 pub fn proxy_Trace(cx: *mut JSTracer, obj: *mut JSObject);
 pub fn proxy_WeakmapKeyDelegate(obj: *mut JSObject) -> *mut JSObject;
 pub fn proxy_Convert(cx: *mut JSContext, obj: JSHandleObject, hint: Enum_JSType,
-                     vp: JSMutableHandleValue) -> c_bool;
+                     vp: JSMutableHandleValue) -> bool;
 pub fn proxy_Finalize(fop: *mut Struct_JSFreeOp, obj: *mut JSObject);
 pub fn proxy_HasInstance(cx: *mut JSContext, proxy: JSHandleObject, v: JSMutableHandleValue,
-                         bp: *mut c_bool) -> c_bool;
-pub fn proxy_Call(cx: *mut JSContext, argc: uint, vp: *mut JSVal) -> bool;
-pub fn proxy_Construct(cx: *mut JSContext, argc: uint, vp: *mut JSVal) -> bool;
+                         bp: *mut bool) -> bool;
+pub fn proxy_Call(cx: *mut JSContext, argc: libc::c_uint, vp: *mut JSVal) -> bool;
+pub fn proxy_Construct(cx: *mut JSContext, argc: libc::c_uint, vp: *mut JSVal) -> bool;
 pub fn proxy_innerObject(cx: *mut JSContext, obj: JSHandleObject) -> *mut JSObject;
 pub fn proxy_Watch(cx: *mut JSContext, obj: JSHandleObject, id: JSHandleId,
                    callable: JSHandleObject) -> bool;
@@ -201,6 +200,6 @@ pub fn objectPostBarrier(obj: *mut *mut JSObject);
 pub fn objectRelocate(obj: *mut *mut JSObject);
 pub fn objectIsPoisoned(obj: *mut JSObject) -> bool;
 
-pub fn getPersistentRootedObjectList(rt: *mut JSRuntime) -> *libc::c_void;
-pub fn insertObjectLinkedListElement(list: *libc::c_void, elem: *libc::c_void);
+pub fn getPersistentRootedObjectList(rt: *mut JSRuntime) -> *mut libc::c_void;
+pub fn insertObjectLinkedListElement(list: *mut libc::c_void, elem: *mut libc::c_void);
 }

@@ -25,7 +25,6 @@ use jsval::{JSVal, NullValue};
 use glue::{/*CompartmentOptions_SetTraceGlobal,*/ ContextOptions_SetVarObjFix};
 use default_stacksize;
 use default_heapsize;
-use ERR;
 use std::ptr::mut_null;
 use std::str::raw::from_c_str;
 
@@ -151,9 +150,9 @@ impl Cx {
             unnamed_field1: &mut rval,
         };
         unsafe {
-            if ERR == JS_EvaluateUCScript(self.ptr, globhandle, ptr, len,
-                                          filename_cstr.as_ptr(),
-                                          line_num as c_uint, rvalhandle) {
+            if !JS_EvaluateUCScript(self.ptr, globhandle, ptr, len,
+                                    filename_cstr.as_ptr(),
+                                    line_num as c_uint, rvalhandle) {
                 debug!("...err!");
                 Err(())
             } else {

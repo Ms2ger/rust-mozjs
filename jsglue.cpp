@@ -478,8 +478,8 @@ CallJitGetterOp(const JSJitInfo* info, JSContext* cx,
                 JS::Handle<JSObject*> thisObj, void* specializedThis,
                 JS::Value* vp)
 {
-    JSJitGetterCallArgs args(vp);
-    return info->getter(cx, thisObjs, specializedThis, args);
+    JS::CallArgs args = JS::CallArgsFromVp(0, vp);
+    return info->getter(cx, thisObj, specializedThis, JSJitGetterCallArgs(args));
 }
 
 bool
@@ -487,12 +487,12 @@ CallJitSetterOp(const JSJitInfo* info, JSContext* cx,
                 JS::Handle<JSObject*> thisObj, void* specializedThis,
                 JS::Value* vp)
 {
-    JSJitSetterCallArgs args(vp);
-    return info->setter(cx, thisObj, specializedThis, vp);
+    JS::CallArgs args = JS::CallArgsFromVp(1, vp);
+    return info->setter(cx, thisObj, specializedThis, JSJitSetterCallArgs(args));
 }
 
 bool
-CallJitMethodOp(const JSJitInfo* info, JSContext* cx, JSObject* thisObj
+CallJitMethodOp(const JSJitInfo* info, JSContext* cx,
                 JS::Handle<JSObject*> thisObj, void* specializedThis,
                 uint32_t argc, JS::Value* vp)
 {
@@ -501,7 +501,7 @@ CallJitMethodOp(const JSJitInfo* info, JSContext* cx, JSObject* thisObj
 }
 
 void
-SetFunctionNativeReserved(JSObject* fun, size_t which, js::Value* val)
+SetFunctionNativeReserved(JSObject* fun, size_t which, const JS::Value* val)
 {
     js::SetFunctionNativeReserved(fun, which, *val);
 }
@@ -525,14 +525,15 @@ CreateWrapperProxyHandler(const ProxyTraps* aTraps)
 }
 
 JSObject*
-NewProxyObject(JSContext* aCx, const void* aHandler, const js::Class* clasp,
+NewProxyObject(JSContext* aCx, const void* aHandler, /*const*/ js::Class* clasp,
                JS::Handle<JS::Value> priv, JSObject* proto, JSObject* parent)
 {
     auto handler = static_cast<const js::BaseProxyHandler*>(aHandler);
+    auto mutable_handler = const_cast<js::BaseProxyHandler*>(handler);
     clasp->trace = js::proxy_Trace;
     js::ProxyOptions options;
     options.setClass(clasp);
-    return js::NewProxyObject(aCx, handler, priv, proto, parent, options);
+    return js::NewProxyObject(aCx, mutable_handler, priv, proto, parent, options);
 }
 
 JSObject*
