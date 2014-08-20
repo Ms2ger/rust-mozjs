@@ -123,6 +123,11 @@ pub unsafe fn JS_THIS_OBJECT(cx: *mut JSContext, vp: *mut JSVal) -> *mut JSObjec
     r.to_object_or_null()
 }
 
+#[inline(alwyas)]
+pub unsafe fn JS_THIS_VALUE(_cx: *mut JSContext, vp: *mut JSVal) -> JSVal {
+    *vp.offset(1)
+}
+
 #[inline(always)]
 pub unsafe fn JS_CALLEE(_cx: *mut JSContext, vp: *mut JSVal) -> JSVal {
     *vp
