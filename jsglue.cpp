@@ -328,6 +328,55 @@ class ForwardingProxyHandler : public js::BaseProxyHandler
     DEFER_TO_TRAP_OR_BASE_CLASS(BaseProxyHandler)
 };
 
+class CrossCompartmentSecurityWrapperProxyHandler
+    : public js::CrossCompartmentSecurityWrapper
+{
+    ProxyTraps mTraps;
+  public:
+    CrossCompartmentSecurityWrapperProxyHandler(const ProxyTraps& aTraps)
+        : js::CrossCompartmentSecurityWrapper(0)
+        , mTraps(aTraps)
+    {}
+
+    virtual bool getPropertyDescriptor(JSContext *cx, JSObject *proxy, jsid id,
+                                       bool set, JSPropertyDescriptor *desc)
+    {
+        return mTraps.getPropertyDescriptor(cx, proxy, id, set, desc);
+    }
+
+    virtual bool getOwnPropertyDescriptor(JSContext *cx, JSObject *proxy,
+                                          jsid id, bool set,
+                                          JSPropertyDescriptor *desc)
+    {
+        return mTraps.getOwnPropertyDescriptor(cx, proxy, id, set, desc);
+    }
+
+    virtual bool defineProperty(JSContext *cx, JSObject *proxy, jsid id,
+                                JSPropertyDescriptor *desc)
+    {
+        return mTraps.defineProperty(cx, proxy, id, desc);
+    }
+
+    virtual bool getOwnPropertyNames(JSContext *cx, JSObject *proxy,
+                                     JS::AutoIdVector &props)
+    {
+        return mTraps.getOwnPropertyNames(cx, proxy, props);
+    }
+
+    virtual bool delete_(JSContext *cx, JSObject *proxy, jsid id, bool *bp)
+    {
+        return mTraps.delete_(cx, proxy, id, bp);
+    }
+
+    virtual bool enumerate(JSContext *cx, JSObject *proxy,
+                           JS::AutoIdVector &props)
+    {
+        return mTraps.enumerate(cx, proxy, props);
+    }
+
+    DEFER_TO_TRAP_OR_BASE_CLASS(BaseProxyHandler)
+};
+
 extern "C" {
 
 bool
@@ -394,6 +443,12 @@ const void*
 CreateWrapperProxyHandler(const ProxyTraps* aTraps)
 {
     return new WrapperProxyHandler(*aTraps);
+}
+
+const void*
+CreateCrossCompartmentSecurityWrapperProxyHandler(const ProxyTraps* aTraps)
+{
+    return new CrossCompartmentSecurityWrapperProxyHandler(*aTraps);
 }
 
 JSObject*
