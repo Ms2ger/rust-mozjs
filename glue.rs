@@ -43,6 +43,11 @@ pub struct ProxyTraps {
     pub trace: Option<extern "C" fn(*mut JSTracer, *mut JSObject)>,
 }
 
+pub static WRAPPER_ACTION_GET: libc::c_int = 0;
+pub static WRAPPER_ACTION_SET: libc::c_int = 1;
+pub static WRAPPER_ACTION_CALL: libc::c_int = 2;
+pub static WRAPPER_ACTION_PUNCTURE: libc::c_int = 3;
+
 #[link(name = "jsglue")]
 extern { }
 
@@ -73,7 +78,10 @@ pub fn GetFunctionNativeReserved(fun: *mut JSObject, which: libc::size_t) -> *mu
 
 pub fn CreateProxyHandler(traps: *const ProxyTraps, extra: *const libc::c_void) -> *const libc::c_void;
 pub fn CreateWrapperProxyHandler(traps: *const ProxyTraps) -> *const libc::c_void;
-pub fn CreateCrossCompartmentSecurityWrapperProxyHandler(traps: *const ProxyTraps) -> *const libc::c_void;
+pub fn CreateCrossCompartmentSecurityWrapperProxyHandler(
+    traps: *const ProxyTraps,
+    enter: extern "C" fn(*mut JSContext, *mut JSObject, jsid, libc::c_int, *mut bool))
+    -> *const libc::c_void;
 pub fn NewProxyObject(cx: *mut JSContext, handler: *const libc::c_void, priv_: *const JSVal,
                       proto: *mut JSObject, parent: *mut JSObject, call: *mut JSObject,
                       construct: *mut JSObject) -> *mut JSObject;

@@ -328,14 +328,25 @@ class ForwardingProxyHandler : public js::BaseProxyHandler
     DEFER_TO_TRAP_OR_BASE_CLASS(BaseProxyHandler)
 };
 
+typedef bool (*EnterTrap)(JSContext *cx, JSObject *wrapper, jsid id, int act,
+                          bool *bp);
+
+MOZ_STATIC_ASSERT(js::Wrapper::GET == 0, "Update glue.rs");
+MOZ_STATIC_ASSERT(js::Wrapper::SET == 1, "Update glue.rs");
+MOZ_STATIC_ASSERT(js::Wrapper::CALL == 2, "Update glue.rs");
+MOZ_STATIC_ASSERT(js::Wrapper::PUNCTURE == 3, "Update glue.rs");
+
 class CrossCompartmentSecurityWrapperProxyHandler
     : public js::CrossCompartmentSecurityWrapper
 {
     ProxyTraps mTraps;
+    EnterTrap mEnter;
   public:
-    CrossCompartmentSecurityWrapperProxyHandler(const ProxyTraps& aTraps)
+    CrossCompartmentSecurityWrapperProxyHandler(const ProxyTraps& aTraps,
+                                                EnterTrap aEnter)
         : js::CrossCompartmentSecurityWrapper(0)
         , mTraps(aTraps)
+        , mEnter(aEnter)
     {}
 
     virtual bool getPropertyDescriptor(JSContext *cx, JSObject *proxy, jsid id,
@@ -375,6 +386,12 @@ class CrossCompartmentSecurityWrapperProxyHandler
     }
 
     DEFER_TO_TRAP_OR_BASE_CLASS(BaseProxyHandler)
+
+    virtual bool enter(JSContext *cx, JSObject *wrapper, jsid id,
+                       js::Wrapper::Action act, bool *bp) const MOZ_OVERRIDE
+    {
+        return mEnter(cx, wrapper, id, act, bp);
+    }
 };
 
 extern "C" {
@@ -446,9 +463,10 @@ CreateWrapperProxyHandler(const ProxyTraps* aTraps)
 }
 
 const void*
-CreateCrossCompartmentSecurityWrapperProxyHandler(const ProxyTraps* aTraps)
+CreateCrossCompartmentSecurityWrapperProxyHandler(const ProxyTraps* aTraps,
+                                                  EnterTrap aEnter)
 {
-    return new CrossCompartmentSecurityWrapperProxyHandler(*aTraps);
+    return new CrossCompartmentSecurityWrapperProxyHandler(*aTraps, aEnter);
 }
 
 JSObject*
