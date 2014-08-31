@@ -2,11 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//XXXjdm whyyyyyyyyyyy
-#define UINT32_MAX ((uint32_t)-1)
+#define __STDC_LIMIT_MACROS
+#define __STDC_CONSTANT_MACROS
+#define __STDC_FORMAT_MACROS
+#include <stdint.h>
 
 #include "jsapi.h"
 #include "jsfriendapi.h"
+#include "jsgc.h"
 #include "jsproxy.h"
 #include "jsclass.h"
 #include "jswrapper.h"
@@ -629,6 +632,24 @@ JSObject*
 UnwrapObject(JSObject* obj, JSBool stopAtOuter, unsigned* flags)
 {
     return js::UnwrapObject(obj, stopAtOuter, flags);
+}
+
+JSCompartment*
+GetObjectCompartment(JSObject* object)
+{
+    return js::GetObjectCompartment(object);
+}
+
+JSCompartment*
+GetContextCompartment(JSContext* cx)
+{
+    return js::GetContextCompartment(cx);
+}
+
+void*
+GetCrossCompartmentWrapperSingleton()
+{
+    return &js::CrossCompartmentWrapper::singleton;
 }
 
 } // extern "C"

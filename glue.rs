@@ -119,4 +119,8 @@ pub fn GetGlobalForObjectCrossCompartment(obj: *mut JSObject) -> *mut JSObject;
 pub fn ReportError(cx: *mut JSContext, error: *const libc::c_char);
 pub fn IsWrapper(obj: *mut JSObject) -> JSBool;
 pub fn UnwrapObject(obj: *mut JSObject, stopAtOuter: JSBool, flags: *mut libc::c_uint) -> *mut JSObject;
+
+pub fn GetObjectCompartment(object: *mut JSObject) -> *mut JSCompartment;
+pub fn GetContextCompartment(cx: *mut JSContext) -> *mut JSCompartment;
+pub fn GetCrossCompartmentWrapperSingleton() -> *const libc::c_void;
 }
