@@ -444,25 +444,26 @@ macro_rules! rooted {
     }
 }
 
-impl<T> Handle<T> {
+impl<'a, T> Handle<'a, T> {
     pub fn get(&self) -> T
         where T: Copy
     {
         unsafe { *self.ptr }
     }
 
-    pub unsafe fn from_marked_location(ptr: *const T) -> Handle<T> {
+    pub unsafe fn from_marked_location<'b>(ptr: *const T) -> Handle<'b, T> {
         Handle {
             _base: HandleBase { _phantom0: PhantomData },
             ptr: ptr,
+            phantom: PhantomData,
         }
     }
 }
 
-impl<T> Deref for Handle<T> {
+impl<'a, T: 'a> Deref for Handle<'a, T> {
     type Target = T;
 
-    fn deref<'a>(&'a self) -> &'a T {
+    fn deref(&self) -> &T {
         unsafe { &*self.ptr }
     }
 }
@@ -508,14 +509,14 @@ impl<T> DerefMut for MutableHandle<T> {
     }
 }
 
-impl HandleValue {
-    pub fn null() -> HandleValue {
+impl HandleValue<'static> {
+    pub fn null() -> Self {
         unsafe {
             NullHandleValue
         }
     }
 
-    pub fn undefined() -> HandleValue {
+    pub fn undefined() -> Self {
         unsafe {
             UndefinedHandleValue
         }
@@ -540,8 +541,8 @@ impl HandleValueArray {
 
 const ConstNullValue: *mut JSObject = 0 as *mut JSObject;
 
-impl HandleObject {
-    pub fn null() -> HandleObject {
+impl HandleObject<'static> {
+    pub fn null() -> Self {
         unsafe {
             HandleObject::from_marked_location(&ConstNullValue)
         }

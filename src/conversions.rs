@@ -202,7 +202,7 @@ impl FromJSValConvertible for JSVal {
     }
 }
 
-impl ToJSValConvertible for HandleValue {
+impl<'a> ToJSValConvertible for HandleValue<'a> {
     #[inline]
     unsafe fn to_jsval(&self, cx: *mut JSContext, rval: MutableHandleValue) {
         rval.set(self.get());

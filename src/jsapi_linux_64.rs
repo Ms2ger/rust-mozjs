@@ -100,13 +100,13 @@ pub enum JSString { }
 pub enum JSAddonId { }
 pub type Latin1Char = ::std::os::raw::c_uchar;
 pub enum Symbol { }
-pub type HandleFunction = Handle<*mut JSFunction>;
-pub type HandleId = Handle<jsid>;
-pub type HandleObject = Handle<*mut JSObject>;
-pub type HandleScript = Handle<*mut JSScript>;
-pub type HandleString = Handle<*mut JSString>;
-pub type HandleSymbol = Handle<*mut Symbol>;
-pub type HandleValue = Handle<Value>;
+pub type HandleFunction<'a> = Handle<'a, *mut JSFunction>;
+pub type HandleId<'a> = Handle<'a, jsid>;
+pub type HandleObject<'a> = Handle<'a, *mut JSObject>;
+pub type HandleScript<'a> = Handle<'a, *mut JSScript>;
+pub type HandleString<'a> = Handle<'a, *mut JSString>;
+pub type HandleSymbol<'a> = Handle<'a, *mut Symbol>;
+pub type HandleValue<'a> = Handle<'a, Value>;
 pub type MutableHandleFunction = MutableHandle<*mut JSFunction>;
 pub type MutableHandleId = MutableHandle<jsid>;
 pub type MutableHandleObject = MutableHandle<*mut JSObject>;
@@ -1017,9 +1017,10 @@ pub enum TenuredHeap_RootingAPI_h_unnamed_4 { maskBits = 0, }
  */
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct Handle<T> {
+pub struct Handle<'a, T: 'a> {
     pub _base: HandleBase<T>,
     pub ptr: *const T,
+    pub phantom: ::std::marker::PhantomData<&'a T>,
 }
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -5804,17 +5805,17 @@ fn bindgen_test_layout_ObjectPrivateVisitor() {
 }
 extern "C" {
     #[link_name = "_ZN2JS15NullHandleValueE"]
-    pub static NullHandleValue: Handle<Value>;
+    pub static NullHandleValue: Handle<'static, Value>;
     #[link_name = "_ZN2JS20UndefinedHandleValueE"]
-    pub static UndefinedHandleValue: Handle<Value>;
+    pub static UndefinedHandleValue: Handle<'static, Value>;
     #[link_name = "_ZN2JS15TrueHandleValueE"]
-    pub static TrueHandleValue: Handle<Value>;
+    pub static TrueHandleValue: Handle<'static, Value>;
     #[link_name = "_ZN2JS16FalseHandleValueE"]
-    pub static FalseHandleValue: Handle<Value>;
+    pub static FalseHandleValue: Handle<'static, Value>;
     pub static JSID_VOID: jsid;
     pub static JSID_EMPTY: jsid;
-    pub static JSID_VOIDHANDLE: Handle<jsid>;
-    pub static JSID_EMPTYHANDLE: Handle<jsid>;
+    pub static JSID_VOIDHANDLE: Handle<'static, jsid>;
+    pub static JSID_EMPTYHANDLE: Handle<'static, jsid>;
     #[link_name = "_ZN2js16FunctionClassPtrE"]
     pub static FunctionClassPtr: *const Class;
     #[link_name = "_ZN2js13ProxyClassOpsE"]
